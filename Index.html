@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SILENT ASYLUM: NIGHTMARE CORRIDOR | Horror 3D Game</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Game Render Container -->
+    <div id="game-container"></div>
+
+    <!-- Atmospheric Visual Overlays -->
+    <div class="vignette"></div>
+    <div class="film-grain"></div>
+    <div id="danger-overlay" class="danger-overlay"></div>
+
+    <!-- Crosshair -->
+    <div id="crosshair"></div>
+
+    <!-- Interactive Raycast Prompt -->
+    <div id="interaction-prompt"></div>
+
+    <!-- Small toast / hint messages -->
+    <div id="toast"></div>
+
+    <!-- HUD Overlay -->
+    <div id="hud">
+        <div class="hud-top">
+            <div class="hud-left">
+                <div class="relic-tracker">
+                    <h3>RELIQUIAS ANCESTRALES</h3>
+                    <div class="relic-count" id="relic-counter">0 / 5</div>
+                </div>
+                <div class="map-status" id="map-status">PLANO: NO ENCONTRADO</div>
+            </div>
+
+            <div class="controls-hint">
+                <p><span>WASD</span> Moverse | <span>SHIFT</span> Correr</p>
+                <p><span>F</span> Linterna | <span>E</span> Interactuar | <span>M</span> Mapa</p>
+            </div>
+        </div>
+
+        <div class="hud-bottom">
+            <div class="status-bar-container">
+                <div class="status-label">
+                    <span>RESISTENCIA (STAMINA)</span>
+                </div>
+                <div class="bar-outer">
+                    <div class="bar-inner" id="stamina-bar"></div>
+                </div>
+            </div>
+
+            <div class="status-bar-container">
+                <div class="status-label">
+                    <span>BATERÍA DE LINTERNA</span>
+                </div>
+                <div class="bar-outer">
+                    <div class="bar-inner" id="battery-bar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Menu Overlay -->
+    <div id="start-screen" class="overlay-screen active">
+        <div class="screen-inner">
+            <h1 class="game-title">SILENT ASYLUM</h1>
+            <p class="game-subtitle">EL PASADIZO DE LAS SOMBRAS</p>
+
+            <div class="instructions-box">
+                <h4>INSTRUCCIONES DE SUPERVIVENCIA:</h4>
+                <ul>
+                    <li><span class="key">OBJETIVO</span> Encuentra las 5 Reliquias Ancestrales y abre la puerta sellada de la SALIDA.</li>
+                    <li><span class="key">MAPA</span> El plano del asilo está en el Archivo. Sin él no sabrás dónde está la salida.</li>
+                    <li><span class="key">PISTAS</span> Las páginas del diario de Elena están clavadas por el asilo: revelan dónde escondió cada reliquia.</li>
+                    <li><span class="key">AMENAZA</span> Una entidad oscura te acecha. Oye tus pasos al correr y ve la luz de tu linterna.</li>
+                    <li><span class="key">SILBIDOS</span> La entidad silba. Cuanto más fuerte y cerca suene, más próxima está; el oído izquierdo o derecho te dice de dónde viene.</li>
+                    <li><span class="key">WASD</span> Moverse por el asilo.</li>
+                    <li><span class="key">MOUSE</span> Mirar a tu alrededor.</li>
+                    <li><span class="key">SHIFT</span> Correr (gasta resistencia y atrae al monstruo).</li>
+                    <li><span class="key">F</span> Encender / apagar la linterna.</li>
+                    <li><span class="key">E</span> Recoger objetos, leer notas y abrir la puerta.</li>
+                    <li><span class="key">M</span> Consultar el plano (cuando lo tengas).</li>
+                </ul>
+            </div>
+
+            <button id="start-btn" class="btn-horror">INICIAR JUEGO</button>
+        </div>
+    </div>
+
+    <!-- Jumpscare Flash Overlay -->
+    <div id="jumpscare-overlay"></div>
+
+    <!-- Note Reading Overlay -->
+    <div id="note-overlay" class="overlay-screen">
+        <div class="screen-inner">
+            <div class="note-paper">
+                <h3 id="note-title">Nota</h3>
+                <p id="note-text"></p>
+                <div class="note-footer">[E] Cerrar</div>
+            </div>
+            <button id="note-close-btn" class="btn-horror">CERRAR (E)</button>
+        </div>
+    </div>
+
+    <!-- Map Overlay -->
+    <div id="map-overlay" class="overlay-screen">
+        <div class="screen-inner map-screen">
+            <h2 class="map-title">PLANO DEL ASILO</h2>
+            <div class="map-frame">
+                <canvas id="minimap" width="660" height="600"></canvas>
+            </div>
+            <div class="map-legend">
+                <span><i class="legend-player"></i> Tú</span>
+                <span><i class="legend-exit"></i> Salida</span>
+                <span><i class="legend-relic"></i> Reliquia descubierta</span>
+                <span><i class="legend-note"></i> Nota leída</span>
+            </div>
+            <button id="map-close-btn" class="btn-horror">CERRAR (M)</button>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="overlay-screen">
+        <div class="screen-inner">
+            <h2>HAS MUERTO</h2>
+            <p>Las sombras te devoraron en la oscuridad...</p>
+            <button id="retry-btn" class="btn-horror">REINTENTAR</button>
+        </div>
+    </div>
+
+    <!-- Victory Screen -->
+    <div id="victory-screen" class="overlay-screen">
+        <div class="screen-inner">
+            <h2>¡HAS ESCAPADO!</h2>
+            <p>Lograste recolectar todas las reliquias y romper la maldición.</p>
+
+            <div class="stats-box">
+                <p>Tiempo de Escape: <span id="stat-time">0s</span></p>
+                <p>Reliquias Recolectadas: <span id="stat-relics">5 / 5</span></p>
+                <p>Baterías Utilizadas: <span id="stat-batteries">0</span></p>
+                <p>Notas Leídas: <span id="stat-notes">0 / 7</span></p>
+                <p>Plano Encontrado: <span id="stat-map">No</span></p>
+            </div>
+
+            <button id="play-again-btn" class="btn-horror">JUGAR DE NUEVO</button>
+        </div>
+    </div>
+
+    <!-- Three.js Libraries -->
+    <script src="js/lib/three.min.js"></script>
+    <script src="js/lib/PointerLockControls.js"></script>
+
+    <!-- Game Scripts -->
+    <script src="js/audio.js"></script>
+    <script src="js/textures.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/monster.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
